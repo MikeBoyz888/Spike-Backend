@@ -2,7 +2,7 @@ const { create } = require('../models/category');
 const Product = require('../models/product');
 const Order = require('../models/order');
 const User = require('../models/user');
-const Category = require('../models/Category');
+const Category = require('../models/category');
 
 const createProduct = async (productData) => {
 
