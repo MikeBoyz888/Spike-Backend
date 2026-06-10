@@ -6,6 +6,8 @@ const DataBaseConnect = require('./config/mongoConnect'); // Kết nối đến 
 
 const app = express();
 
+DataBaseConnect();
+
 app.use(cors());
 app.use(express.json());
 
@@ -40,5 +42,7 @@ app.get('/', (req, res) => {
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}`);
-    DataBaseConnect();
 });
+
+module.exports = app;
+
