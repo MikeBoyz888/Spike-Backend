@@ -10,7 +10,7 @@ router.put('/:id', verifyToken, isAdmin, uploadProduct.array('images', 5), produ
 router.delete('/:id', verifyToken, isAdmin, productController.deleteProduct);
 router.get('/', productController.getAllProducts); //lấy all product, sắp xếp theo ngày tạo mới nhất
 router.get('/filters', productController.getFilterOptions)
-router.get('/:slug', productController.getProductBySlug); //lấy data product theo slug trong api/products/:slug
+router.get('/:slug', productController.getProductBySlug); //lấy data product theo slug trong api/product/:slug
 router.post('/:id/review', verifyToken, uploadProduct.array('images', 2), productController.createReview);
 
 module.exports = router;

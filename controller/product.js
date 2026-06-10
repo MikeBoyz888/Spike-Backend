@@ -91,7 +91,7 @@ const deleteProduct = async (req, res) => {
 
 const getProductBySlug = async (req, res) => {
     try {
-        const slug = req.params.slug; //lấy slug từ api/products/:slug
+        const slug = req.params.slug; //lấy slug từ api/product/:slug
         const product = await productService.getProductBySlug(slug);
         res.status(200).json({
             success: true,
