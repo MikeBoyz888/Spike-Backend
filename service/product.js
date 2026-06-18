@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const { create } = require('../models/category');
 const Product = require('../models/product');
 const Order = require('../models/order');
@@ -5,6 +6,9 @@ const User = require('../models/user');
 const Category = require('../models/category');
 
 const createProduct = async (productData) => {
+    if (productData.variants && typeof productData.variants === 'string') {
+        productData.variants = JSON.parse(productData.variants);
+    }
 
     if (!productData.slug && productData.name) {
         productData.slug = productData.name.toString().toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
@@ -49,7 +53,7 @@ const getAllProducts = async (query) => {
         filter.name = { $regex: query.keyword, $options: 'i' }; //tìm sp theo keyword, $regex để tìm kiếm từ gần đúng, $options: 'i' để không phân biệt hoa thường
     }
     if (query.category) {
-        filter.category = query.category; //lọc sp theo category nếu có
+        filter.category = new mongoose.Types.ObjectId(query.category); //chuyển category thành ObjectId
     }
     if (query.brand) {
         // ^ và $ để đảm bảo tìm khớp chính xác chữ
@@ -70,8 +74,24 @@ const getAllProducts = async (query) => {
         sortOption = { basePrice: -1 }; //giá giảm dần
     }
 
-    const products = await Product.find(filter).sort(sortOption).skip(skip).limit(limit);
+    const pipeline = [
+        { $match: filter },
+        {
+            $addFields: {
+                totalStock: { $sum: "$variants.stock" } // tính tổng kho của các variants
+            }
+        },
+        {
+            $addFields: {
+                isOutOfStock: { $cond: [{ $lte: ["$totalStock", 0] }, 1, 0] } // 1 là hết hàng, 0 là còn hàng
+            }
+        },
+        { $sort: { isOutOfStock: 1, ...sortOption } }, //sort 0 lên trước, 1 xuống cuối
+        { $skip: skip },
+        { $limit: limit }
+    ];
 
+    const products = await Product.aggregate(pipeline);
     const totalProducts = await Product.countDocuments(filter); //đếm tổng số sp sau khi lọc để tính tổng trang
     const totalPages = Math.ceil(totalProducts / limit); //tính tổng trang
 

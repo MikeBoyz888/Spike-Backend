@@ -1,5 +1,5 @@
-const cloudinary = require('cloudinary').v2;
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('cloudinary');
+const CloudinaryStorage = require('multer-storage-cloudinary');
 const multer = require('multer');
 require('dotenv').config();
 
@@ -13,7 +13,7 @@ const productStorage = new CloudinaryStorage({ // setting thư mục ảnh
     cloudinary: cloudinary,
     params: {
         folder: 'Spike_Products',
-        allowedFormats: ['jpg', 'jpeg', 'png', 'webp'],
+        allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
     }
 });
 
@@ -21,7 +21,7 @@ const avatarStorage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
         folder: 'Avatar',
-        allowedFormats: ['jpg', 'png', 'jpeg', 'webp'],
+        allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
         transformation: [
             { width: 400, height: 400, crop: 'fill', gravity: 'face' }, // Giới hạn 400x400, AI tự động tìm khuôn mặt để đưa vào trung tâm
             { quality: 'auto', fetch_format: 'auto' } // Tự động nén dung lượng xuống thấp nhất mà không mờ

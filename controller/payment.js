@@ -91,25 +91,40 @@ const vnpayReturn = async (req, res) => {
             let rspCode = vnp_Params['vnp_ResponseCode'];
 
             if (rspCode === '00') {
-                const updatedOrder = await Order.findByIdAndUpdate(orderId, { //thanh toán thành công -> update đơn ->xóa cart
+                const updatedOrder = await Order.findByIdAndUpdate(orderId, { //payment success
                     status: 'Processing',
                     paymentMethod: 'VNPay - Paid'
                 }, { new: true });
 
-                const user = await User.findById(updatedOrder.user);
-                user.cart = [];
-                await user.save();
+                if (updatedOrder) {
+                    const user = await User.findById(updatedOrder.user); //delete cart
+                    if (user) {
+                        user.cart = [];
+                        await user.save();
+                    }
 
-                try {
-                    const message = `... nội dung mail ...`;  // Gửi mail báo thanh toán thành công
-                    await sendEmail({ email: user.email, subject: 'Transaction Confirmed', message });
-                } catch (emailError) {
-                    console.log('Error sending email:', emailError);
+                    try { //send mail
+                        const message = `Thank you for shopping at Spike Garment. Your order has been successfully paid!`;
+                        await sendEmail({ email: user.email, subject: 'Transaction Confirmed', message });
+                    } catch (emailError) {
+                        console.log('Error sending email:', emailError);
+                    }
                 }
 
-                res.redirect(`${process.env.FRONTEND_URL}/profile?status=success`);
-            } else {
-                res.redirect(`${process.env.FRONTEND_URL}/checkout?status=failed`);
+                return res.status(200).json({
+                    success: true,
+                    message: 'Payment verified successfully!'
+                });
+            } else { //payment fail
+                await Order.findByIdAndUpdate(orderId, {
+                    status: 'Failed',
+                    paymentMethod: 'VNPay - Failed'
+                });
+
+                return res.status(400).json({
+                    success: false,
+                    message: 'Payment failed or canceled by user.'
+                });
             }
         } else {
             res.status(400).json({

@@ -4,7 +4,8 @@ const createProduct = async (req, res) => {
     try {
         const productData = req.body;
         if (req.files && req.files.length > 0) {
-            productData.images = req.files.map(file => file.path); // lưu link ảnh và gom thành 1 mảng
+            // lưu link ảnh và gom thành 1 mảng, boolean để bỏ undefined/null/rỗng
+            productData.images = req.files.map(file => file.path || file.secure_url).filter(Boolean);
         }
 
         if (typeof productData.variants === 'string') { //chuyển dữ liệu variants (gốc là text) sang JSON cho mongodb đọc

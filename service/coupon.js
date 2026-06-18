@@ -1,6 +1,6 @@
 const Coupon = require('../models/coupon');
 
-const validateCoupon = async (code) => {
+const validateCoupon = async (code, userId) => {
     const coupon = await Coupon.findOne({ code: code.toUpperCase(), isActive: true });
 
     if (!coupon) {
@@ -8,6 +8,9 @@ const validateCoupon = async (code) => {
     }
     if (new Date() > coupon.expiryDate) {
         throw new Error('Coupon has expired!');
+    }
+    if (coupon.usedBy.includes(userId)) {
+        throw new Error('You have already used this coupon!');
     }
 
     return { discountPercent: coupon.discountPercent };

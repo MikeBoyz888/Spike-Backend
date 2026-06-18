@@ -111,7 +111,7 @@ const verifyOtp = async (email, otp) => {
 };
 
 const resetPassword = async (email, otp, newPassword) => {
-    validatePassword(password);
+    validatePassword(newPassword);
 
     const user = await User.findOne({
         email,
@@ -145,6 +145,7 @@ const toggleWishlist = async (userId, productId) => {
 
 const getWishlist = async (userId) => {
     const user = await User.findById(userId).populate('wishlist');
+    if (!user) throw new Error('User not found');
     return user.wishlist;
 };
 
@@ -160,6 +161,25 @@ const updateUserRole = async (id, role) => {
     return await User.findByIdAndUpdate(id, { role }, { new: true }).select('-password');
 };
 
+const changePassword = async (userId, currentPassword, newPassword) => {
+    const user = await User.findById(userId);
+    if (!user) throw new Error('User not found!');
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+        throw new Error('The current password is incorrect!');
+    }
+
+    validatePassword(newPassword);
+
+    //hash pass mới
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+
+    await user.save();
+    return true;
+};
+
 module.exports = {
     registerUser,
     loginUser,
@@ -170,5 +190,6 @@ module.exports = {
     getWishlist,
     getAllUsers,
     deleteUser,
-    updateUserRole
+    updateUserRole,
+    changePassword
 };

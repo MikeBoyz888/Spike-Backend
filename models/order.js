@@ -12,13 +12,17 @@ const orderSchema = new mongoose.Schema({
             quantity: Number
         }
     ],
+    subtotal: { type: Number, default: 0 },
+    discount: { type: Number, default: 0 },
+    couponCode: { type: String, default: null },
+    shippingFee: { type: Number, default: 0 },
     totalAmount: { type: Number, required: true },
     shippingAddress: { type: String, required: true },
     paymentMethod: { type: String, default: 'COD' },
     status: {
         type: String,
         default: 'Pending',
-        enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled']
+        enum: ['Pending', 'Processing', 'Shipping', 'Delivered', 'Failed', 'Cancelled']
     }
 }, { timestamps: true });
 

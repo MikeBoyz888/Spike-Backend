@@ -3,7 +3,8 @@ const couponService = require('../service/coupon.js');
 const validateCoupon = async (req, res) => {
     try {
         const { code } = req.body;
-        const result = await couponService.validateCoupon(code);
+        const userId = req.user.userId;
+        const result = await couponService.validateCoupon(code, userId);
         res.status(200).json({ success: true, discountPercent: result.discountPercent });
     } catch (error) {
         res.status(400).json({ success: false, message: error.message });

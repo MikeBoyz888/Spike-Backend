@@ -13,10 +13,11 @@ router.post('/forgot-password', userController.forgotPassword);
 router.post('/verify-otp', userController.verifyOtp);
 router.post('/reset-password', userController.resetPassword);
 router.post('/wishlist/toggle', verifyToken, userController.toggleWishlist);
+router.get('/wishlist', verifyToken, userController.getWishlist);
 router.get('/my-reviews', verifyToken, userController.getMyReviews);
-
 router.get('/', verifyToken, isAdmin, userController.getAllUsers);
 router.delete('/:id', verifyToken, isAdmin, userController.deleteUser);
 router.put('/role/:id', verifyToken, isAdmin, userController.updateRole);
+router.put('/change-password', verifyToken, userController.changePassword);
 
 module.exports = router;

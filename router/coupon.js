@@ -3,7 +3,7 @@ const router = express.Router();
 const couponController = require('../controller/coupon');
 const { verifyToken, isAdmin } = require('../middleware/auth');
 
-router.post('/validate', couponController.validateCoupon);
+router.post('/validate', verifyToken, couponController.validateCoupon);
 router.get('/latest', couponController.getLatestCoupon);
 
 router.get('/all', verifyToken, isAdmin, couponController.getAllCoupons);

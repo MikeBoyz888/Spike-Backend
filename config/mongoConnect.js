@@ -8,7 +8,8 @@ const DataBaseConnect = async () => {
 
     try {
         await mongoose.connect(process.env.MONGO_URL, {
-            serverSelectionTimeoutMS: 5000, //báo lỗi sau 5s 
+            serverSelectionTimeoutMS: 5000,
+            family: 4 //báo lỗi sau 5s 
         });
         console.log('DATABASE CONNECTED SUCCESSFULLY');
     } catch (error) {

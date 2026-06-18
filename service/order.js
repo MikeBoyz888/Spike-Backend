@@ -50,6 +50,11 @@ const createOrder = async (userId, orderData) => {
 
         coupon.usedBy.push(userId);
         await coupon.save();
+
+        if (!paymentMethod || paymentMethod === 'COD') { //nếu chọn cod thì tạo order r xóa cart
+            user.cart = [];
+            await user.save();
+        }
     }
 
     const finalTotalAmount = (subtotal - discountAmount) + Number(shippingFee);
@@ -78,12 +83,17 @@ const finalizeOrder = async (userId, orderId) => {// Chỉ xóa cart khi thanh t
 };
 
 const getOrderHistory = async (userId) => {
-    const orders = await Order.find({ user: userId }).sort({ createdAt: -1 });
+    const orders = await Order.find({ user: userId })
+        .populate('products.productId', 'slug images')
+        .sort({ createdAt: -1 });
     return orders;
 };
 
 const checkAllOrderAdmin = async () => { //check hóa đơn của user theo tên và email
-    const orders = await Order.find().populate('user', 'username email').sort({ createdAt: -1 });
+    const orders = await Order.find()
+        .populate('user', 'username email')
+        .populate('products.productId', 'slug images')
+        .sort({ createdAt: -1 });
     return orders;
 };
 

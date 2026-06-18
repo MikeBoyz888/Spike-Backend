@@ -266,6 +266,16 @@ const toggleWishlist = async (req, res) => {
     }
 };
 
+const getWishlist = async (req, res) => {
+    try {
+        const wishlist = await userService.getWishlist(req.user.userId);
+        res.status(200).json({ success: true, data: wishlist });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+
 const getMyReviews = async (req, res) => {
     try {
         const userId = req.user.userId;
@@ -347,6 +357,26 @@ const updateRole = async (req, res) => {
     }
 };
 
+const changePassword = async (req, res) => {
+    try {
+        const userId = req.user.userId; // lấy từ middleware verifyToken
+        const { currentPassword, newPassword } = req.body;
+
+        await userService.changePassword(userId, currentPassword, newPassword);
+
+        res.status(200).json({
+            success: true,
+            message: 'Password changed successfully!'
+        });
+    } catch (error) {
+        console.log('Error changing password:', error);
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
 module.exports = {
     registerUser,
     loginUser,
@@ -357,8 +387,10 @@ module.exports = {
     verifyOtp,
     resetPassword,
     toggleWishlist,
+    getWishlist,
     getMyReviews,
     getAllUsers,
     deleteUser,
-    updateRole
+    updateRole,
+    changePassword
 };
